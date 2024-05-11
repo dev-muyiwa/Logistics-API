@@ -1,0 +1,35 @@
+{
+  "name": "logistics-api",
+  "version": "1.0.0",
+  "description": "Build a RESTful API using Node.js, Express, TypeScript, and a SQL database (preferrably PostgreSQL).",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-muyiwa/Logistics-API.git"
+  },
+  "author": "Moyosoreoluwa Odusola",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dev-muyiwa/Logistics-API/issues"
+  },
+  "homepage": "https://github.com/dev-muyiwa/Logistics-API#readme",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/nodemailer": "^6.4.15",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.13",
+    "pg": "^8.11.5"
+  }
+}

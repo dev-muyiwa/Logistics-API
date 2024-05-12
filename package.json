@@ -6,7 +6,7 @@
   "scripts": {
     "test": "",
     "build": "tsc -p .",
-    "start": "node dist/src/index.js",
+    "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "create-migration": "node migrations/index.js"
   },

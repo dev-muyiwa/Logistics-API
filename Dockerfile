@@ -8,9 +8,9 @@ RUN npm install
 
 COPY . .
 
-RUN npm run deploy-migration
-
 RUN npm run build
+
+RUN npm run deploy-migration
 
 EXPOSE 8000
 

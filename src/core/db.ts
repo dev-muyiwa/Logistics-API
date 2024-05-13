@@ -8,6 +8,7 @@ export async function setUpDatabase(): Promise<Client> {
         database: config.DB.NAME,
         host: config.DB.HOST,
         port: config.DB.PORT,
+
     })
 
     try {

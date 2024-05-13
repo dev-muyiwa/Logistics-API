@@ -6,7 +6,7 @@ import {UserService} from "../services/user.service";
 import {errorResponse} from "../utils/handler";
 import {User} from "../models/user";
 
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
     id?: string
     user?: User
 }
@@ -30,6 +30,10 @@ export async function authorizeAccessToken(
         const user = await UserService.findOneById(id)
         if (!user) {
             return Exception.notFound()
+        }
+
+        if (!user.refresh_token) {
+            return Exception.forbidden()
         }
 
         req.id = id

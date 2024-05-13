@@ -5,7 +5,6 @@ const {config} = require('./../dist/core/config');
 const dotenv = require('dotenv');
 
 dotenv.config();
-
 function runMigrations() {
     const migrationsDir = path.join(__dirname)
     const migrationDirs = fs.readdirSync(migrationsDir)

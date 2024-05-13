@@ -46,7 +46,7 @@ export class AuthController {
     public async login(req: Request, res: Response) {
         try {
             const {email, password} = validateUserLoginParams(req.body)
-            const existingUser = await UserService.findOneByEmail(email)
+            let existingUser = await UserService.findOneByEmail(email)
             if (!existingUser) {
                 return Exception.notFound()
             }
@@ -56,6 +56,11 @@ export class AuthController {
             }
 
             const accessToken = AuthService.generateAccessToken(existingUser.id, existingUser.email)
+            if (!existingUser.refresh_token) {
+                const refreshToken = AuthService.generateRefreshToken(existingUser.id, existingUser.email)
+                existingUser = await UserService.updateUser({id: existingUser.id, refresh_token: refreshToken})
+            }
+
             return successResponse(res, {
                 id: existingUser.id,
                 access_token: accessToken,

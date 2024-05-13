@@ -5,5 +5,5 @@ export class User {
     email?: string
     phone_number?: string | null
     password?: string
-    refresh_token?: string
+    refresh_token?: string | null
 }

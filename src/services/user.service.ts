@@ -5,7 +5,9 @@ import {User} from "../models/user";
 
 export class UserService {
     public static async findOneByEmail(email: string) {
-        const query = `SELECT * FROM users WHERE email = $1`
+        const query = `SELECT *
+                       FROM users
+                       WHERE email = $1`
         const result = await pgClient?.query(query, [email])
 
         if (result && result.rows.length > 0) {
@@ -16,7 +18,9 @@ export class UserService {
     }
 
     public static async findOneById(id: string) {
-        const query = `SELECT * FROM users WHERE id = $1`
+        const query = `SELECT *
+                       FROM users
+                       WHERE id = $1`
         const result = await pgClient?.query(query, [id])
 
         if (result && result.rows.length > 0) {
@@ -36,7 +40,9 @@ export class UserService {
             .map((key, index) => `${key} = $${index + 1}`)
             .join(' AND ')
 
-        const query = `SELECT * FROM users WHERE ${selectClause}`;
+        const query = `SELECT *
+                       FROM users
+                       WHERE ${selectClause}`;
         const result = await pgClient.query(query, [...values]);
 
         if (result.rows.length === 0) {
@@ -49,7 +55,8 @@ export class UserService {
     public static async createUser(data: User,) {
         const {first_name, last_name, email, phone_number, password, refresh_token} = data
         const id = ulid()
-        const query = `INSERT INTO users (id, first_name, last_name, email, phone_number, password, refresh_token, updated_at)
+        const query = `INSERT INTO users (id, first_name, last_name, email, phone_number, password, refresh_token,
+                                          updated_at)
                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                        RETURNING id, first_name, last_name, email, phone_number, created_at, updated_at`
         const result = await pgClient.query(query, [id, first_name, last_name, email, phone_number, password, refresh_token, new Date()])
@@ -63,6 +70,9 @@ export class UserService {
 
     public static async updateUser(data: User) {
         const {id, ...fieldsToUpdate} = data
+        if (!id) {
+            throw new Exception('missing id for update operation', Exception.SERVER_ERROR)
+        }
 
         if (Object.keys(fieldsToUpdate).length === 0) {
             throw new Error('no fields to update provided')
@@ -73,7 +83,11 @@ export class UserService {
             .join(', ')
 
         const values = [id, ...Object.values(fieldsToUpdate)];
-        const query = `UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *`
+        const query = `UPDATE users
+                       SET ${setClause},
+                           updated_at = CURRENT_TIMESTAMP
+                       WHERE id = $1
+                       RETURNING *`
 
         const result = await pgClient.query(query, values);
         if (result.rows.length === 0) {

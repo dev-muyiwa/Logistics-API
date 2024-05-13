@@ -1,5 +1,7 @@
 FROM node:latest
 
+RUN apt-get update && apt-get install -y postgresql-client
+
 WORKDIR /Logistik
 
 COPY package*.json .

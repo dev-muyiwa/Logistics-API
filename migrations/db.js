@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const {execSync} = require('child_process');
 const {config} = require('./../dist/core/config');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 function runMigrations() {
     const migrationsDir = path.join(__dirname)

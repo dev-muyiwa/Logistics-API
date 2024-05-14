@@ -51,9 +51,9 @@ describe('AuthController', () => {
             (sendEmail as jest.Mock).mockResolvedValueOnce(null);
             await authController.register(req as Request, res as Response);
 
-            expect(UserService.findOneByEmail).toHaveBeenCalledWith('test@example.com');
-            expect(AuthService.hashPassword).toHaveBeenCalledWith('password');
-            expect(sendEmail).toHaveBeenCalledTimes(1)
+            expect(UserService.findOneByEmail as jest.Mock).toHaveBeenCalledWith('test@example.com');
+            expect(AuthService.hashPassword as jest.Mock).toHaveBeenCalledWith('password');
+            expect(sendEmail as jest.Mock).toHaveBeenCalledTimes(1)
 
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith({
@@ -79,10 +79,11 @@ describe('AuthController', () => {
 
             await authController.register(req as Request, res as Response)
 
-            expect(UserService.findOneByEmail).toHaveBeenCalledWith('test@example.com');
-            expect(AuthService.hashPassword).not.toHaveBeenCalled();
-            expect(UserService.createUser).not.toHaveBeenCalled();
-            expect(sendEmail).not.toHaveBeenCalled();
+            expect(UserService.findOneByEmail as jest.Mock).toHaveBeenCalledWith('test@example.com');
+            expect(AuthService.hashPassword as jest.Mock).not.toHaveBeenCalled();
+            expect(UserService.createUser as jest.Mock).not.toHaveBeenCalled();
+            expect(sendEmail as jest.Mock).not.toHaveBeenCalled();
+
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
                 success: false,
                 message: 'an account exists with this email'
@@ -109,7 +110,7 @@ describe('AuthController', () => {
 
             await authController.login(req as Request, res as Response);
 
-            expect(UserService.findOneByEmail).toHaveBeenCalledWith('test@example.com');
+            expect(UserService.findOneByEmail as jest.Mock).toHaveBeenCalledWith('test@example.com');
             expect(AuthService.generateAccessToken as jest.Mock).toHaveBeenCalled();
 
             expect(res.status).toHaveBeenCalledWith(200);
@@ -148,7 +149,7 @@ describe('AuthController', () => {
 
             await authController.login(req as Request, res as Response);
 
-            expect(UserService.findOneByEmail).toHaveBeenCalledWith('test@example.com');
+            expect(UserService.findOneByEmail as jest.Mock).toHaveBeenCalledWith('test@example.com');
             expect(AuthService.generateAccessToken as jest.Mock).toHaveBeenCalled();
 
             expect(res.status).toHaveBeenCalledWith(200);
@@ -173,9 +174,9 @@ describe('AuthController', () => {
 
             await authController.login(req as Request, res as Response);
 
-            expect(UserService.findOneByEmail).toHaveBeenCalledWith('test@example.com');
-            expect(AuthService.verifyPassword).not.toHaveBeenCalled();
-            expect(AuthService.generateAccessToken).not.toHaveBeenCalled();
+            expect(UserService.findOneByEmail as jest.Mock).toHaveBeenCalledWith('test@example.com');
+            expect(AuthService.verifyPassword as jest.Mock).not.toHaveBeenCalled();
+            expect(AuthService.generateAccessToken as jest.Mock).not.toHaveBeenCalled();
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
@@ -200,9 +201,9 @@ describe('AuthController', () => {
 
             await authController.login(req as Request, res as Response);
 
-            expect(UserService.findOneByEmail).toHaveBeenCalledWith('test@example.com');
-            expect(AuthService.verifyPassword).toHaveBeenCalled();
-            expect(AuthService.generateAccessToken).not.toHaveBeenCalled();
+            expect(UserService.findOneByEmail as jest.Mock).toHaveBeenCalledWith('test@example.com');
+            expect(AuthService.verifyPassword as jest.Mock).toHaveBeenCalled();
+            expect(AuthService.generateAccessToken as jest.Mock).not.toHaveBeenCalled();
 
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
@@ -224,14 +225,14 @@ describe('AuthController', () => {
 
             await authController.forgotPassword(req as Request, res as Response);
 
-            expect(UserService.findOneByEmail).toHaveBeenCalledWith('test@example.com');
-            expect(AuthService.generatePasswordResetToken).toHaveBeenCalledWith('user_id', 'test@example.com');
-            expect(TokenService.createToken).toHaveBeenCalledWith({
+            expect(UserService.findOneByEmail as jest.Mock).toHaveBeenCalledWith('test@example.com');
+            expect(AuthService.generatePasswordResetToken as jest.Mock).toHaveBeenCalledWith('user_id', 'test@example.com');
+            expect(TokenService.createToken as jest.Mock).toHaveBeenCalledWith({
                 code: resetToken,
                 type: 'reset',
                 user_id: 'user_id'
             });
-            expect(sendEmail).toHaveBeenCalled();
+            expect(sendEmail as jest.Mock).toHaveBeenCalled();
 
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
@@ -247,7 +248,7 @@ describe('AuthController', () => {
 
             await authController.forgotPassword(req as Request, res as Response);
 
-            expect(UserService.findOneByEmail).toHaveBeenCalledWith('test@example.com');
+            expect(UserService.findOneByEmail as jest.Mock).toHaveBeenCalledWith('test@example.com');
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
@@ -270,9 +271,9 @@ describe('AuthController', () => {
 
             await authController.verifyPasswordResetToken(req as Request, res as Response);
 
-            expect(TokenService.findOneByCode).toHaveBeenCalledWith('reset_token');
-            expect(AuthService.verifyPasswordResetToken).toHaveBeenCalledWith('reset_token');
-            expect(TokenService.updateToken).toHaveBeenCalledWith({
+            expect(TokenService.findOneByCode as jest.Mock).toHaveBeenCalledWith('reset_token');
+            expect(AuthService.verifyPasswordResetToken as jest.Mock).toHaveBeenCalledWith('reset_token');
+            expect(TokenService.updateToken as jest.Mock).toHaveBeenCalledWith({
                 id: 'token_id',
                 verified_at: expect.any(Date),
                 expires_at: expect.any(Date)
@@ -414,12 +415,12 @@ describe('AuthController', () => {
 
             await authController.generateAccessToken(req as Request, res as Response);
 
-            expect(AuthService.verifyRefreshToken).toHaveBeenCalledWith('refresh_token');
-            expect(UserService.findOneBy).toHaveBeenCalledWith({
+            expect(AuthService.verifyRefreshToken as jest.Mock).toHaveBeenCalledWith('refresh_token');
+            expect(UserService.findOneBy as jest.Mock).toHaveBeenCalledWith({
                 refresh_token: 'refresh_token',
                 email: 'test@example.com'
             });
-            expect(AuthService.generateAccessToken).toHaveBeenCalledWith('user_id', 'test@example.com');
+            expect(AuthService.generateAccessToken as jest.Mock).toHaveBeenCalledWith('user_id', 'test@example.com');
 
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
@@ -439,8 +440,8 @@ describe('AuthController', () => {
 
             await authController.generateAccessToken(req as Request, res as Response);
 
-            expect(AuthService.verifyRefreshToken).toHaveBeenCalledWith('refresh_token');
-            expect(UserService.findOneBy).toHaveBeenCalledWith({
+            expect(AuthService.verifyRefreshToken as jest.Mock).toHaveBeenCalledWith('refresh_token');
+            expect(UserService.findOneBy as jest.Mock).toHaveBeenCalledWith({
                 refresh_token: 'refresh_token',
                 email: 'test@example.com'
             });

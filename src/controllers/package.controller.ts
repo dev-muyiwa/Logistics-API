@@ -70,6 +70,11 @@ export class PackageController {
                 if (existingPackage.status === PackageStatus.Delivered) {
                     clearInterval(updateInterval);
                     console.log(`Package ${packageId} is delivered.`);
+                    await sendEmail({
+                        to: [senderEmail, existingPackage.primary_email],
+                        subject: `Successful Delivery of package ${packageId}`,
+                        html: `<p>Hello.\n Your package with ID of ${packageId} has been successfully delivered.</p>`
+                    })
                     return;
                 }
 
@@ -91,13 +96,6 @@ export class PackageController {
 
                 await PackageService.updatePackage({id: existingPackage.id, status: nextStatus});
                 console.log(`Package ${packageId} status updated to: ${nextStatus}`)
-                if (nextStatus === PackageStatus.Delivered) {
-                    await sendEmail({
-                        to: [senderEmail, existingPackage.primary_email],
-                        subject: `Successful Delivery of package ${packageId}`,
-                        html: `<p>Hello.\n Your package with ID of ${packageId} has been successfully delivered.</p>`
-                    })
-                }
 
             } catch (error) {
                 console.error('Error occurred while updating package status:', error)

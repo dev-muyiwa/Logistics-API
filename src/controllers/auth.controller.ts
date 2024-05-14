@@ -34,7 +34,7 @@ export class AuthController {
             const user = await UserService.createUser({id: userId, ...validatedInput, refresh_token: refreshToken})
 
             await sendEmail({
-                to: user.email,
+                to: validatedInput.email,
                 subject: `Welcome to ${config.APP_NAME}!`,
                 html: `<h1>You have registered successfully as a user on our platform.</h1>>`
             })

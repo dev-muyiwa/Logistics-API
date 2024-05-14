@@ -2,13 +2,14 @@ import type { Config } from '@jest/types';
 
 const config: Config.InitialOptions = {
     testEnvironment: 'node',
-    roots: ['tests'],
+    preset: 'ts-jest',
+    roots: ['<rootDir>/tests'],
     transform: {
         '^.+\\.tsx?$': 'ts-jest',
     },
-    setupFiles: ["dotenv/config"],
-    collectCoverage: true,
-    verbose: true,
+    testPathIgnorePatterns: ['<rootDir>/src', '<rootDir>/migrations'],
+    // collectCoverage: true,
+    // verbose: true,
 };
 
 export default config;

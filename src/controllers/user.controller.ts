@@ -2,8 +2,9 @@ import {Response} from "express";
 import {errorResponse, successResponse} from "../utils/handler";
 import {AuthenticatedRequest} from "../middlewares/auth";
 import {User} from "../models/user";
-import {validateUpdateUserParams} from "../validation/user";
+import {validateGetPackagesPaginationParams, validateUpdateUserParams} from "../validation/user";
 import {UserService} from "../services/user.service";
+import {PackageService} from "../services/package.service";
 
 export class UserController {
     public async getMe(req: AuthenticatedRequest, res: Response) {
@@ -44,6 +45,29 @@ export class UserController {
             })
 
             return successResponse(res, null, 'account logged out')
+        } catch (err) {
+            return errorResponse(res, err)
+        }
+    }
+
+//     Packages
+    async getMyPackages(req: AuthenticatedRequest, res: Response) {
+        try {
+            const user = req.user as User
+            const {page} = validateGetPackagesPaginationParams(req.query)
+
+            const {data, total_count} = await PackageService.getPackagesForAUser(user.id!, Number(page))
+            const message = data.length > 0 ? 'packages fetched' : 'no package found'
+
+            const paginationObject = {
+                current_page: Number(page),
+                limit: data.length,
+                data: data,
+                total_pages: Math.ceil(total_count / 20),
+                total_items: Number(total_count)
+            }
+
+            return successResponse(res, paginationObject, message)
         } catch (err) {
             return errorResponse(res, err)
         }

@@ -1,4 +1,5 @@
-import {z} from "zod";
+import {z, ZodError} from "zod";
+import Exception from "../utils/exception";
 
 export function validateUpdateUserParams(data: any) {
     return z
@@ -22,5 +23,19 @@ export function validateUpdateUserParams(data: any) {
             if (data.phone_number === '' || data.phone_number === undefined) data.phone_number = null;
 
             return true;
+        }).parse(data)
+}
+
+export function validateGetPackagesPaginationParams(data: any) {
+    return z
+        .object(({
+            page: z.string().optional().default('1')
+        }))
+        .refine(data => {
+            const page = parseInt(data.page);
+            if (isNaN(page)) {
+                throw new Exception('Page must be a number');
+            }
+            return { page };
         }).parse(data)
 }

@@ -1,6 +1,6 @@
 -- Add your SQL migration script here
 
-CREATE TYPE status_type AS ENUM ('Pending', 'In Transit', 'Out for Delivery', 'Delivered');
+CREATE TYPE status_type AS ENUM ('Pending', 'In Transit', 'Ready for Pickup', 'Out for Delivery', 'Delivered');
 
 
 CREATE TABLE IF NOT EXISTS packages

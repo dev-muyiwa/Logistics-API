@@ -1,6 +1,7 @@
 export enum PackageStatus {
     Pending = "Pending",
     In_Transit = "In Transit",
+    Ready_for_Pickup = "Ready for Pickup",
     Out_for_Delivery = "Out for Delivery",
     Delivered = "Delivered"
 }

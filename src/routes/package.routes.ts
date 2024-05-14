@@ -6,7 +6,8 @@ const packageRouter: Router = Router()
 const packageController: PackageController = new PackageController()
 
 packageRouter.post('/', authorizeAccessToken, packageController.createPackage)
-packageRouter.post('/:packageId', packageController.findPackage)
+packageRouter.get('/:packageId', packageController.findPackage)
+packageRouter.put('/:packageId/submit', authorizeAccessToken, packageController.submitPackageForDelivery)
 
 
 export default packageRouter

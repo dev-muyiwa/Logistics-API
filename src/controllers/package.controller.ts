@@ -1,5 +1,5 @@
 import {AuthenticatedRequest} from "../middlewares/auth";
-import {Response} from "express";
+import {Request, Response} from "express";
 import {errorResponse, successResponse} from "../utils/handler";
 import {validatePackageCreationParams} from "../validation/package";
 import {User} from "../models/user";
@@ -30,27 +30,19 @@ export class PackageController {
                 user_id: user.id,
             })
 
-            await sendEmail({
-                to: primary_email,
-                subject: 'Package confirmation',
-                html: `<p>Hello.\n You have a package to be delivered to you on ${formatDate(new Date(pickup_date))} with tracking code ${newPackage.tracking_code}.</p>`
-            })
-
-            await PackageController.updatePackageStatus(newPackage.id, user.email!)
-
             return successResponse(res, newPackage, 'package created', 201)
         } catch (err) {
             return errorResponse(res, err)
         }
     }
 
-    async findPackage(req: AuthenticatedRequest, res: Response) {
+    async findPackage(req: Request, res: Response) {
         try {
-            const user = req.user as User
+            // const user = req.user as User
             const {packageId} = req.params
 
             const existingPackage = await PackageService.findOneById(packageId)
-            if (!existingPackage || existingPackage.user_id !== user.id) {
+            if (!existingPackage) {
                 return Exception.notFound()
             }
 
@@ -60,30 +52,48 @@ export class PackageController {
         }
     }
 
+    async submitPackageForDelivery(req: AuthenticatedRequest, res: Response) {
+        try {
+            const user = req.user as User
+            const {packageId} = req.params
+
+            let existingPackage = await PackageService.findOneById(packageId)
+            if (!existingPackage || existingPackage.user_id !== user.id) {
+                return Exception.notFound()
+            }
+
+            if (existingPackage.status !== PackageStatus.Pending) {
+                throw new Exception('you can only submit pending packages')
+            }
+
+            existingPackage = await PackageService.updatePackage({id: existingPackage.id, status: PackageStatus.In_Transit})
+            await sendEmail({
+                to: existingPackage.primary_email,
+                subject: 'Package confirmation',
+                html: `<p>Hello.\n You have a package to be delivered to you on ${formatDate(existingPackage.pickup_date)} with tracking code ${existingPackage.id}.</p>`
+            })
+
+            await PackageController.updatePackageStatus(existingPackage.id, user.email!)
+
+            return successResponse(res, existingPackage, 'package is being processed for delivery')
+        } catch (err) {
+            return errorResponse(res, err)
+        }
+    }
+
     private static async updatePackageStatus(packageId: string, senderEmail: string) {
-        const interval = 2 * 60 * 1000 // 2 minutes in milliseconds
+        const interval = 1 * 60 * 1000 // 2 minutes in milliseconds
 
         const updateInterval = setInterval(async () => {
             try {
                 const existingPackage = await PackageService.findOneById(packageId);
 
-                if (existingPackage.status === PackageStatus.Delivered) {
-                    clearInterval(updateInterval);
-                    console.log(`Package ${packageId} is delivered.`);
-                    await sendEmail({
-                        to: [senderEmail, existingPackage.primary_email],
-                        subject: `Successful Delivery of package ${packageId}`,
-                        html: `<p>Hello.\n Your package with ID of ${packageId} has been successfully delivered.</p>`
-                    })
-                    return;
-                }
-
                 let nextStatus: PackageStatus;
                 switch (existingPackage.status) {
-                    case PackageStatus.Pending:
-                        nextStatus = PackageStatus.In_Transit;
-                        break;
                     case PackageStatus.In_Transit:
+                        nextStatus = PackageStatus.Ready_for_Pickup;
+                        break;
+                    case PackageStatus.Ready_for_Pickup:
                         nextStatus = PackageStatus.Out_for_Delivery;
                         break;
                     case PackageStatus.Out_for_Delivery:
@@ -96,6 +106,18 @@ export class PackageController {
 
                 await PackageService.updatePackage({id: existingPackage.id, status: nextStatus});
                 console.log(`Package ${packageId} status updated to: ${nextStatus}`)
+
+                if (nextStatus === PackageStatus.Delivered) {
+                    clearInterval(updateInterval);
+                    console.log(`Package ${packageId} is delivered.`);
+                    await sendEmail({
+                        to: [senderEmail, existingPackage.primary_email],
+                        subject: `Successful Delivery of package ${packageId}`,
+                        html: `<p>Hello.\n Your package with ID of ${packageId} has been successfully delivered.</p>`
+                    })
+                    return;
+                }
+
 
             } catch (error) {
                 console.error('Error occurred while updating package status:', error)

@@ -15,6 +15,7 @@ import {config} from "../core/config";
 import {sendEmail} from "../utils/mail";
 import {TokenService} from "../services/token.service";
 import {JwtPayload} from "jsonwebtoken";
+import {ulid} from "ulid";
 
 export class AuthController {
 
@@ -27,9 +28,10 @@ export class AuthController {
             }
 
             validatedInput.password = await AuthService.hashPassword(validatedInput.password)
-            const user = await UserService.createUser(validatedInput)
-            const refreshToken = AuthService.generateRefreshToken(user.id, user.email)
-            await UserService.updateUser({id: user.id, refresh_token: refreshToken})
+            const userId = ulid()
+            const refreshToken = AuthService.generateRefreshToken(userId, validatedInput.email)
+
+            const user = await UserService.createUser({id: userId, ...validatedInput, refresh_token: refreshToken})
 
             await sendEmail({
                 to: user.email,

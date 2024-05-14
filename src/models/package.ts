@@ -1,19 +1,19 @@
 export enum PackageStatus {
-    Pending = "Pending",
-    In_Transit = "In Transit",
-    Ready_for_Pickup = "Ready for Pickup",
-    Out_for_Delivery = "Out for Delivery",
-    Delivered = "Delivered"
+  Pending = 'Pending',
+  In_Transit = 'In Transit',
+  Ready_for_Pickup = 'Ready for Pickup',
+  Out_for_Delivery = 'Out for Delivery',
+  Delivered = 'Delivered'
 }
 
 export class Package {
-    id?: string
-    name?: string
-    description?: string | null
-    status?: PackageStatus
-    pickup_date?: Date
-    primary_email?: string
-    secondary_email?: string | null
-    tracking_code?: string
-    user_id?: string
+  id?: string
+  name?: string
+  description?: string | null
+  status?: PackageStatus
+  pickup_date?: Date
+  primary_email?: string
+  secondary_email?: string | null
+  tracking_code?: string
+  user_id?: string
 }

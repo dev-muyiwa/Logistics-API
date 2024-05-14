@@ -1,6 +1,5 @@
 import dotenv from 'dotenv'
 
-
 dotenv.config()
 export const config = {
   APP_NAME: process.env.APP_NAME,

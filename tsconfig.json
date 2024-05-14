@@ -115,6 +115,7 @@
   "exclude": [
     "tests",
     "node_modules",
-    "migrations"
+    "migrations",
+    "jest.config.ts"
   ]
 }

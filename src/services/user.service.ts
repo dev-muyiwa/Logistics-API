@@ -58,7 +58,7 @@ export class UserService {
         const query = `INSERT INTO users (id, first_name, last_name, email, phone_number, password, refresh_token,
                                           updated_at)
                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                       RETURNING id, first_name, last_name, email, phone_number, created_at, updated_at`
+                       RETURNING id, first_name, last_name, email, phone_number, refresh_token, created_at, updated_at`
         const result = await pgClient.query(query, [id, first_name, last_name, email, phone_number, password, refresh_token, new Date()])
 
         if (result && result.rowCount! > 0) {

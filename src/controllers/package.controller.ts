@@ -8,6 +8,7 @@ import { sendEmail } from '../utils/mail'
 import { formatDate } from '../utils/util'
 import { PackageStatus } from '../models/package'
 import Exception from '../utils/exception'
+import { config } from '../core/config'
 
 export class PackageController {
   async createPackage(req: AuthenticatedRequest, res: Response) {
@@ -65,10 +66,13 @@ export class PackageController {
         id: existingPackage.id,
         status: PackageStatus.In_Transit
       })
+
+      const url = `${config.BASE_URL}/api/packages/${existingPackage.id}`
       await sendEmail({
         to: existingPackage.primary_email,
         subject: 'Package confirmation',
-        html: `<p>Hello.\n You have a package to be delivered to you on ${formatDate(existingPackage.pickup_date)} with tracking code ${existingPackage.id}.</p>`
+        html: `<p>Hello.\n You have a package to be delivered to you on ${formatDate(existingPackage.pickup_date)} with tracking code ${existingPackage.id}.\n
+                Here is a link to track your package: <a href='${url}'>${url}</a></p>`
       })
 
       await PackageController.updatePackageStatus(
@@ -90,7 +94,7 @@ export class PackageController {
     packageId: string,
     senderEmail: string
   ) {
-    const interval = 1 * 60 * 1000 // 2 minutes in milliseconds
+    const interval = 2 * 60 * 1000 // 2 minutes in milliseconds
 
     const updateInterval = setInterval(async () => {
       try {
@@ -121,10 +125,13 @@ export class PackageController {
         if (nextStatus === PackageStatus.Delivered) {
           clearInterval(updateInterval)
           console.log(`Package ${packageId} is delivered.`)
+
+          const url = `${config.BASE_URL}/api/packages/${existingPackage.id}`
           await sendEmail({
             to: [senderEmail, existingPackage.primary_email],
             subject: `Successful Delivery of package ${packageId}`,
-            html: `<p>Hello.\n Your package with ID of ${packageId} has been successfully delivered.</p>`
+            html: `<p>Hello.\n Your package with ID of ${packageId} has been successfully delivered.\n
+                    Here is a link to view your package: <a href='${url}'>${url}</a></p>`
           })
           return
         }

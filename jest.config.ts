@@ -8,8 +8,6 @@ const config: Config.InitialOptions = {
     '^.+\\.tsx?$': 'ts-jest'
   },
   testPathIgnorePatterns: ['<rootDir>/src', '<rootDir>/migrations']
-  // collectCoverage: true,
-  // verbose: true,
 }
 
 export default config
